@@ -1,0 +1,37 @@
+<?php
+
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\API\AuthController;
+use App\Http\Controllers\API\KendaraanController;
+use App\Http\Controllers\API\PemesananController;
+
+/*
+|--------------------------------------------------------------------------
+| API Routes
+|--------------------------------------------------------------------------
+|
+| Here is where you can register API routes for your application. These
+| routes are loaded by the RouteServiceProvider and all of them will
+| be assigned to the "api" middleware group. Make something great!
+|
+*/
+
+Route::post('/register', [AuthController::class, 'register']);
+Route::post('/login', [AuthController::class, 'login']);
+
+Route::middleware('auth:sanctum')->group(function () {
+    Route::get('/me', [AuthController::class, 'me']);
+    Route::post('/logout', [AuthController::class, 'logout']);
+    Route::get('/pemesanan', [PemesananController::class, 'index']);
+    Route::post('/pemesanan', [PemesananController::class, 'store']);
+    Route::get('/pemesanan/{id}', [PemesananController::class, 'show']);
+    Route::post('/pemesanan/{id}/cancel', [PemesananController::class, 'cancel']);
+    Route::post('/pemesanan/{id}/bayar', [PemesananController::class, 'bayar']);
+});
+
+Route::get('/kendaraan', [KendaraanController::class, 'index']);
+Route::post('/kendaraan', [KendaraanController::class, 'store']);
+Route::get('/kendaraan/{id}', [KendaraanController::class, 'show']);
+Route::put('/kendaraan/{id}', [KendaraanController::class, 'update']);
+Route::delete('/kendaraan/{id}', [KendaraanController::class, 'destroy']);
