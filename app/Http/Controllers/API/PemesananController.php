@@ -5,6 +5,7 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use App\Models\Pemesanan;
 use App\Models\Kendaraan;
+use App\Models\Pembayaran;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -78,29 +79,56 @@ class PemesananController extends Controller
         return response()->json(['message' => 'Pemesanan berhasil dibatalkan']);
     }
 
-    // Melakukan pembayaran 
+    // Melakukan pembayaran
     public function bayar(Request $request, $id)
-{
-    $pemesanan = Pemesanan::findOrFail($id);
+    {
+        $pemesanan = Pemesanan::findOrFail($id);
 
-    if ($request->metode_pembayaran === 'transfer') {
         $request->validate([
-            'bukti_pembayaran' => 'required|image|mimes:jpeg,png,jpg|max:2048'
+            'metode_pembayaran' => 'required|in:Transfer Bank,Kartu Kredit,E-Wallet',
+            'jumlah_pembayaran' => 'required|numeric|min:0',
+            'deposit_keamanan' => 'required|numeric|min:0',
+            'bukti_pembayaran' => 'nullable|image|mimes:jpeg,png,jpg|max:2048'
         ]);
 
-        $path = $request->file('bukti_pembayaran')->store('bukti_pembayaran');
+        // Simpan bukti pembayaran jika ada
+        $path = null;
+        if ($request->hasFile('bukti_pembayaran')) {
+            $path = $request->file('bukti_pembayaran')->store('bukti_pembayaran');
+        }
 
-        $pemesanan->update([
-            'status_pemesanan' => 'Menunggu Konfirmasi',
+        // Hitung total pembayaran (harga sewa + deposit)
+        $totalHarusDibayar = $pemesanan->total_harga_sewa + $request->deposit_keamanan;
+        $statusPembayaran = ($request->jumlah_pembayaran >= $totalHarusDibayar) ? 'Lunas' : 'Belum Lunas';
+
+        // Simpan ke tabel pembayaran
+        $pembayaran = new Pembayaran([
+            'pemesanan_id' => $pemesanan->id,
+            'metode_pembayaran' => $request->metode_pembayaran,
+            'jumlah_pembayaran' => $request->jumlah_pembayaran,
+            'tanggal_pembayaran' => now(),
+            'status_pembayaran' => $statusPembayaran,
+            'deposit_keamanan' => $request->deposit_keamanan,
             'bukti_pembayaran' => $path,
         ]);
-    } else {
-        $pemesanan->update([
-            'status_pemesanan' => 'Dikonfirmasi',
-        ]);
+        $pembayaran->save();
+
+        // Update status pemesanan jika lunas
+        if ($statusPembayaran === 'Lunas') {
+            $pemesanan->update(['status_pemesanan' => 'Dikonfirmasi']);
+        } else {
+            $pemesanan->update(['status_pemesanan' => 'Menunggu Konfirmasi']);
+        }
+
+        return response()->json(['message' => 'Pembayaran berhasil dikonfirmasi', 'status_pembayaran' => $statusPembayaran]);
     }
 
-    return response()->json(['message' => 'Pembayaran berhasil dikonfirmasi']);
-}
+    public function getPembayaranByPemesanan($id)
+    {
+        $pemesanan = Pemesanan::findOrFail($id);
+        $pembayaran = Pembayaran::where('pemesanan_id', $pemesanan->id)->get();
+
+        return response()->json($pembayaran);
+    }
 
 }

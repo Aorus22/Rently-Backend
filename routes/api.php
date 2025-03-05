@@ -5,6 +5,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\KendaraanController;
 use App\Http\Controllers\API\PemesananController;
+use App\Http\Controllers\API\PembayaranController;
+use App\Models\Pembayaran;
 
 /*
 |--------------------------------------------------------------------------
@@ -27,7 +29,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::post('/pemesanan', [PemesananController::class, 'store']);
     Route::get('/pemesanan/{id}', [PemesananController::class, 'show']);
     Route::post('/pemesanan/{id}/cancel', [PemesananController::class, 'cancel']);
-    Route::post('/pemesanan/{id}/bayar', [PemesananController::class, 'bayar']);
+    Route::post('/pemesanan/{id}/bayar', [PembayaranController::class, 'createPayment']);
+    Route::get('/pemesanan/{id}/pembayaran', [PemesananController::class, 'getPembayaranByPemesanan']);
+    Route::get('/pembayaran/{id}', [PembayaranController::class, 'getPaymentDetail']);
+    Route::post('/pembayaran/{id}/upload-bukti', [PembayaranController::class, 'uploadBuktiPembayaran']);
 });
 
 Route::get('/kendaraan', [KendaraanController::class, 'index']);
