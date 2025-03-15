@@ -131,4 +131,24 @@ class PemesananController extends Controller
         return response()->json($pembayaran);
     }
 
+    public function getAllPemesanan() {
+        $pemesanan = Pemesanan::with([
+            'kendaraan:id,merek_model',
+            'user:id,nama_lengkap'
+        ])->get();
+
+        return response()->json($pemesanan);
+    }
+
+    public function updatePemesanan(Request $request, $id)
+    {
+        $Pemesanan = Pemesanan::find($id);
+        if (!$Pemesanan) {
+            return response()->json(['message' => 'Pemesanan tidak ditemukan'], 404);
+        }
+
+        $data = $request->only(['status_pemesanan']);
+        $Pemesanan->update($data);
+        return response()->json(['message' => 'Pemesanan berhasil diperbarui!', 'data' => $Pemesanan]);
+    }
 }

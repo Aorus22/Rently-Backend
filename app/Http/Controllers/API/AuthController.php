@@ -61,12 +61,6 @@ class AuthController extends Controller
     }
 
     public function getData(Request $request) {
-        $token = $request->bearerToken();
-
-        if (!$token) {
-            return response()->json(['error' => 'Unathorized'], 401);
-        }
-
         $users = User::all()->makeHidden('password');
         return response()->json($users);
     }

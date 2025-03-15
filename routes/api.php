@@ -17,6 +17,7 @@ Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/adminlogin', [AdminController::class, 'login']);
 
+// User (no middleware)
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/me', [AuthController::class, 'me']);
     Route::post('/logout', [AuthController::class, 'logout']);
@@ -28,16 +29,25 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/pemesanan/{id}/pembayaran', [PemesananController::class, 'getPembayaranByPemesanan']);
     Route::get('/pembayaran/{id}', [PembayaranController::class, 'getPaymentDetail']);
     Route::post('/pembayaran/{id}/upload-bukti', [PembayaranController::class, 'uploadBuktiPembayaran']);
+});
 
+// Admin (yes middleware)
+Route::middleware(['auth:sanctum', 'admin'])->group(function() {
     // Admin
     Route::get('/admin/akusiapa', [AdminController::class, 'me']);
     Route::post('/admin/adminlogout', [AdminController::class, 'logout']);
     Route::get('/admin/getusers', [AuthController::class, 'getData']);
     Route::put('/admin/user/{id}', [AuthController::class, 'update']);
+
+    // Riwayat Sewa Atmin
+    Route::get('/admin/ceksewa', [PemesananController::class, 'getAllPemesanan']);
+    Route::put('/admin/updatestatus/{id}', [PemesananController::class, 'updatePemesanan']);
+
+    // CRUD Kendaraan
+    Route::post('/admin/kendaraan', [KendaraanController::class, 'store']);
+    Route::put('/admin/kendaraan/{id}', [KendaraanController::class, 'update']);
+    Route::delete('/admin/kendaraan/{id}', [KendaraanController::class, 'destroy']);
 });
 
 Route::get('/kendaraan', [KendaraanController::class, 'index']);
-Route::post('/kendaraan', [KendaraanController::class, 'store']);
 Route::get('/kendaraan/{id}', [KendaraanController::class, 'show']);
-Route::put('/kendaraan/{id}', [KendaraanController::class, 'update']);
-Route::delete('/kendaraan/{id}', [KendaraanController::class, 'destroy']);
