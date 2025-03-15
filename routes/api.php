@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\API\AdminController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\AuthController;
@@ -14,6 +15,7 @@ Route::get('/hello', function () {
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
+Route::post('/adminlogin', [AdminController::class, 'login']);
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::get('/me', [AuthController::class, 'me']);
@@ -26,6 +28,12 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/pemesanan/{id}/pembayaran', [PemesananController::class, 'getPembayaranByPemesanan']);
     Route::get('/pembayaran/{id}', [PembayaranController::class, 'getPaymentDetail']);
     Route::post('/pembayaran/{id}/upload-bukti', [PembayaranController::class, 'uploadBuktiPembayaran']);
+
+    // Admin
+    Route::get('/admin/akusiapa', [AdminController::class, 'me']);
+    Route::post('/admin/adminlogout', [AdminController::class, 'logout']);
+    Route::get('/admin/getusers', [AuthController::class, 'getData']);
+    Route::put('/admin/user/{id}', [AuthController::class, 'update']);
 });
 
 Route::get('/kendaraan', [KendaraanController::class, 'index']);

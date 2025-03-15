@@ -12,6 +12,15 @@ class CreateRentalMobilSchema extends Migration
             $table->id();
             $table->string('nama_lengkap');
             $table->string('email')->unique();
+            $table->enum('status_blokir', ['Ya', 'Tidak']);
+            $table->string('password');
+            $table->timestamps();
+        });
+
+        Schema::create('admins', function (Blueprint $table) {
+            $table->id();
+            $table->string('nama');
+            $table->string('email')->unique();
             $table->string('password');
             $table->timestamps();
         });

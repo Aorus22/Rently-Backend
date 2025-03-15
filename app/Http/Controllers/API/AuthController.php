@@ -21,6 +21,7 @@ class AuthController extends Controller
         $user = User::create([
             'nama_lengkap' => $request->nama_lengkap,
             'email' => $request->email,
+            'status_blokir' => 'Tidak',
             'password' => Hash::make($request->password)
         ]);
 
@@ -57,5 +58,28 @@ class AuthController extends Controller
     {
         $request->user()->currentAccessToken()->delete();
         return response()->json(['message' => 'Logged out']);
+    }
+
+    public function getData(Request $request) {
+        $token = $request->bearerToken();
+
+        if (!$token) {
+            return response()->json(['error' => 'Unathorized'], 401);
+        }
+
+        $users = User::all()->makeHidden('password');
+        return response()->json($users);
+    }
+
+    public function update(Request $request, $id)
+    {
+        $user = User::find($id);
+        if (!$user) {
+            return response()->json(['message' => 'User tidak ditemukan'], 404);
+        }
+
+        $data = $request->only(['status_blokir']);
+        $user->update($data);
+        return response()->json(['message' => 'User berhasil diperbarui!', 'data' => $user]);
     }
 }
