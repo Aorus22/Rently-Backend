@@ -11,7 +11,7 @@ class KendaraanController extends Controller
     // Mengambil semua data kendaraan
     public function index()
     {
-        $kendaraan = Kendaraan::all();
+        $kendaraan = Kendaraan::with('lokasiGarasi')->get();
         return response()->json($kendaraan);
     }
 
@@ -29,7 +29,7 @@ class KendaraanController extends Controller
             'status_ketersediaan' => 'required|in:Tersedia,Disewa,Perawatan',
             'harga_sewa_per_periode' => 'required|numeric',
             'kondisi_fasilitas' => 'required|string',
-            'lokasi_kendaraan' => 'required|string',
+            'lokasi_garasi_id' => 'required|exists:garasi,id',
         ]);
 
         $kendaraan = Kendaraan::create($request->all());
@@ -39,7 +39,7 @@ class KendaraanController extends Controller
     // Mengambil detail kendaraan berdasarkan ID
     public function show($id)
     {
-        $kendaraan = Kendaraan::find($id);
+        $kendaraan = Kendaraan::with('lokasiGarasi')->find($id);
         if (!$kendaraan) {
             return response()->json(['message' => 'Kendaraan tidak ditemukan'], 404);
         }

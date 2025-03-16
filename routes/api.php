@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\API\AdminController;
+use App\Http\Controllers\API\LokasiGarasiController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\AuthController;
@@ -51,3 +52,4 @@ Route::middleware(['auth:sanctum', 'admin'])->group(function() {
 
 Route::get('/kendaraan', [KendaraanController::class, 'index']);
 Route::get('/kendaraan/{id}', [KendaraanController::class, 'show']);
+Route::get('/garasi', [LokasiGarasiController::class, 'index']);
