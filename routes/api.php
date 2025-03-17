@@ -45,12 +45,8 @@ Route::middleware(['auth:sanctum', 'admin'])->group(function() {
     Route::get('/admin/ceksewa', [PemesananController::class, 'getAllPemesanan']);
     Route::put('/admin/updatestatus/{id}', [PemesananController::class, 'updatePemesanan']);
 
-    // CRUD Kendaraan
-    //Route::post('/admin/kendaraan', [KendaraanController::class, 'store']);
-    //Route::put('/admin/kendaraan/{id}', [KendaraanController::class, 'update']);
-    //Route::delete('/admin/kendaraan/{id}', [KendaraanController::class, 'destroy']);
-
     // Dynamic CRUD
+    Route::get('/admin/infotabeldong', [DynamicCrudController::class, 'fetchTableConfig']);
     Route::get('/admin/{table}', [DynamicCrudController::class, 'index']);
     Route::post('/admin/{table}', [DynamicCrudController::class, 'store']);
     Route::get('/admin/{table}/{id}', [DynamicCrudController::class, 'show']);
