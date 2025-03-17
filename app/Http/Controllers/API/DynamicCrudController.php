@@ -129,14 +129,12 @@ class DynamicCrudController extends Controller
                         "type" => "select",
                         "options" => $this->getForeignOptions('pemesanan', 'id', 'id')
                     ],
-                    "detail_perjanjian" => ["type" => "text"],
-                    "tanda_tangan_digital" => ["type" => "text"],
+                    "link_kontrak" => ["type" => "text"],
                     "status_kontrak" => ["type" => "select", "options" => ["Aktif", "Selesai"]]
                 ],
                 "validation" => [
                     "pemesanan_id" => "required|exists:pemesanan,id",
-                    "detail_perjanjian" => "required|string",
-                    "tanda_tangan_digital" => "required|string",
+                    "link_kontrak" => "required|string",
                     "status_kontrak" => "required|in:Aktif,Selesai"
                 ],
                 "detail_view" => true

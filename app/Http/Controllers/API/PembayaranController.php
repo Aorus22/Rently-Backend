@@ -56,7 +56,7 @@ class PembayaranController extends Controller
         }
 
         $request->validate([
-            'bukti_pembayaran' => 'required|image|mimes:jpeg,png,jpg|max:2048'
+            'bukti_pembayaran' => 'required|image|mimes:jpeg,png,jpg,webp|max:4096'
         ]);
 
         $uploadResult = Cloudinary::upload($request->file('bukti_pembayaran')->getRealPath(), [

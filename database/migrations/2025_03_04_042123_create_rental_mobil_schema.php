@@ -25,6 +25,15 @@ class CreateRentalMobilSchema extends Migration
             $table->timestamps();
         });
 
+        Schema::create('lokasi_garasi', function (Blueprint $table) {
+            $table->id();
+            $table->string('kota');
+            $table->text('alamat');
+            $table->decimal('latitude', 10, 7);
+            $table->decimal('longitude', 10, 7);
+            $table->timestamps();
+        });
+
         Schema::create('kendaraan', function (Blueprint $table) {
             $table->id();
             $table->enum('kategori_kendaraan', ['Mobil', 'Minibus', 'Pickup']);
@@ -37,7 +46,7 @@ class CreateRentalMobilSchema extends Migration
             $table->enum('status_ketersediaan', ['Tersedia', 'Disewa', 'Perawatan']);
             $table->decimal('harga_sewa_per_periode', 10, 2);
             $table->text('kondisi_fasilitas');
-            $table->string('lokasi_kendaraan');
+            $table->foreignId('lokasi_garasi_id')->constrained('lokasi_garasi')->onDelete('cascade');
             $table->timestamps();
         });
 
@@ -67,8 +76,7 @@ class CreateRentalMobilSchema extends Migration
         Schema::create('kontrak_sewa', function (Blueprint $table) {
             $table->id();
             $table->foreignId('pemesanan_id')->constrained('pemesanan')->onDelete('cascade');
-            $table->text('detail_perjanjian');
-            $table->text('tanda_tangan_digital');
+            $table->text('link_kontrak');
             $table->enum('status_kontrak', ['Aktif', 'Selesai']);
             $table->timestamps();
         });

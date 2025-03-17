@@ -22,6 +22,11 @@ class Kendaraan extends Model
         'status_ketersediaan',
         'harga_sewa_per_periode',
         'kondisi_fasilitas',
-        'lokasi_kendaraan',
+        'lokasi_garasi_id',
     ];
+
+    public function lokasiGarasi()
+    {
+        return $this->belongsTo(LokasiGarasi::class, 'lokasi_garasi_id');
+    }
 }

@@ -17,7 +17,7 @@ class PemesananController extends Controller
         $user = Auth::user();
 
         $pemesanan = Pemesanan::where('user_id', $user->id)
-            ->with('kendaraan') // Include data kendaraan
+            ->with(['kendaraan.lokasiGarasi'])
             ->orderBy('created_at', 'desc')
             ->get();
 
@@ -34,6 +34,10 @@ class PemesananController extends Controller
         ]);
 
         $kendaraan = Kendaraan::findOrFail($request->kendaraan_id);
+
+        if ($kendaraan->status_ketersediaan !== 'Tersedia') {
+            return response()->json(['message' => 'Kendaraan tidak tersedia untuk disewa'], 400);
+        }
 
         // Hitung total harga
         $tanggalMulai = $request->tanggal_mulai;
@@ -56,7 +60,7 @@ class PemesananController extends Controller
     // Ambil detail pemesanan
     public function show($id)
     {
-        $pemesanan = Pemesanan::with('kendaraan')->findOrFail($id);
+        $pemesanan = Pemesanan::with(['kendaraan.lokasiGarasi'])->findOrFail($id);
 
         if ($pemesanan->user_id !== Auth::id()) {
             return response()->json(['message' => 'Unauthorized'], 403);
@@ -113,6 +117,9 @@ class PemesananController extends Controller
         ]);
         $pembayaran->save();
 
+        $kendaraan = Kendaraan::find($pemesanan->kendaraan_id);
+        $kendaraan->update(['status_ketersediaan' => 'Disewa']);
+
         // Update status pemesanan jika lunas
         if ($statusPembayaran === 'Lunas') {
             $pemesanan->update(['status_pemesanan' => 'Dikonfirmasi']);
@@ -125,9 +132,14 @@ class PemesananController extends Controller
 
     public function getPembayaranByPemesanan($id)
     {
+        $user = Auth::user();
         $pemesanan = Pemesanan::findOrFail($id);
-        $pembayaran = Pembayaran::where('pemesanan_id', $pemesanan->id)->get();
 
+        if ($pemesanan->user_id !== $user->id && !$user->is_admin) {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        $pembayaran = $pemesanan->pembayaran;
         return response()->json($pembayaran);
     }
 

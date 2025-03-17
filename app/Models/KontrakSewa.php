@@ -2,8 +2,8 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
 class KontrakSewa extends Model
 {
@@ -13,8 +13,12 @@ class KontrakSewa extends Model
 
     protected $fillable = [
         'pemesanan_id',
-        'detail_perjanjian',
-        'tanda_tangan_digital',
+        'link_kontrak',
         'status_kontrak',
     ];
+
+    public function pemesanan()
+    {
+        return $this->belongsTo(Pemesanan::class, 'pemesanan_id');
+    }
 }
