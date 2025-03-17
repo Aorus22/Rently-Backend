@@ -29,7 +29,7 @@ class KendaraanController extends Controller
             'status_ketersediaan' => 'required|in:Tersedia,Disewa,Perawatan',
             'harga_sewa_per_periode' => 'required|numeric',
             'kondisi_fasilitas' => 'required|string',
-            'lokasi_garasi_id' => 'required|exists:garasi,id',
+            'lokasi_garasi_id' => 'required|exists:lokasi_garasi,id',
         ]);
 
         $kendaraan = Kendaraan::create($request->all());

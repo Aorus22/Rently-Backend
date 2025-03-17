@@ -14,10 +14,10 @@ class DynamicCrudController extends Controller
     {
         return [
             "User" => [
-                "can_create" => true,
+                "can_create" => false,
                 "can_read" => true,
                 "can_update" => true,
-                "can_delete" => true,
+                "can_delete" => false,
                 "editable_columns" => [
                     "status_blokir" => ["type" => "select", "options" => ["Ya", "Tidak"]]
                 ],
@@ -42,7 +42,10 @@ class DynamicCrudController extends Controller
                     "status_ketersediaan" => ["type" => "select", "options" => ["Tersedia", "Disewa", "Perawatan"]],
                     "harga_sewa_per_periode" => ["type" => "number"],
                     "kondisi_fasilitas" => ["type" => "text"],
-                    "lokasi_kendaraan" => ["type" => "text"]
+                    "lokasi_garasi_id" => [
+                        "type" => "select",
+                        "options" => $this->getForeignOptions('lokasi_garasi', 'id', 'kota')
+                    ],
                 ],
                 "validation" => [
                     "kategori_kendaraan" => "required|in:Mobil,Minibus,Pickup",
@@ -55,67 +58,36 @@ class DynamicCrudController extends Controller
                     "status_ketersediaan" => "required|in:Tersedia,Disewa,Perawatan",
                     "harga_sewa_per_periode" => "required|numeric",
                     "kondisi_fasilitas" => "required|string",
-                    "lokasi_kendaraan" => "required|string"
+                    "lokasi_garasi_id" => "required|exists:lokasi_garasi,id"
                 ],
                 "detail_view" => true
             ],
             "Pemesanan" => [
-                "can_create" => true,
+                "can_create" => false,
                 "can_read" => true,
                 "can_update" => true,
-                "can_delete" => true,
+                "can_delete" => false,
                 "editable_columns" => [
-                    "user_id" => [
-                        "type" => "select",
-                        "options" => $this->getForeignOptions('users', 'id', 'nama_lengkap')
-                    ],
-                    "kendaraan_id" => [
-                        "type" => "select",
-                        "options" => $this->getForeignOptions('kendaraan', 'id', 'merek_model')
-                    ],
-                    "tanggal_mulai" => ["type" => "date"],
-                    "tanggal_selesai" => ["type" => "date"],
-                    "total_harga_sewa" => ["type" => "number"],
                     "status_pemesanan" => ["type" => "select", "options" => [
                         "Menunggu Pembayaran", "Menunggu Konfirmasi", "Dikonfirmasi",
                         "Sedang dalam Penggunaan", "Dibatalkan", "Selesai"
                     ]]
                 ],
                 "validation" => [
-                    "user_id" => "required|exists:users,id",
-                    "kendaraan_id" => "required|exists:kendaraan,id",
-                    "tanggal_mulai" => "required|date",
-                    "tanggal_selesai" => "required|date|after_or_equal:tanggal_mulai",
-                    "total_harga_sewa" => "required|numeric",
                     "status_pemesanan" => "required|in:Menunggu Pembayaran,Menunggu Konfirmasi,Dikonfirmasi,Sedang dalam Penggunaan,Dibatalkan,Selesai"
                 ],
                 "detail_view" => true
             ],
             "Pembayaran" => [
-                "can_create" => true,
+                "can_create" => false,
                 "can_read" => true,
                 "can_update" => true,
-                "can_delete" => true,
+                "can_delete" => false,
                 "editable_columns" => [
-                    "pemesanan_id" => [
-                        "type" => "select",
-                        "options" => $this->getForeignOptions('pemesanan', 'id', 'id')
-                    ],
-                    "metode_pembayaran" => ["type" => "select", "options" => ["Transfer Bank", "Kartu Kredit", "E-Wallet"]],
-                    "jumlah_pembayaran" => ["type" => "number"],
-                    "tanggal_pembayaran" => ["type" => "date"],
                     "status_pembayaran" => ["type" => "select", "options" => ["Lunas", "Belum Lunas", "Pending"]],
-                    "deposit_keamanan" => ["type" => "number"],
-                    "bukti_pembayaran" => ["type" => "text"]
                 ],
                 "validation" => [
-                    "pemesanan_id" => "required|exists:pemesanan,id",
-                    "metode_pembayaran" => "required|in:Transfer Bank,Kartu Kredit,E-Wallet",
-                    "jumlah_pembayaran" => "required|numeric",
-                    "tanggal_pembayaran" => "nullable|date",
                     "status_pembayaran" => "required|in:Lunas,Belum Lunas,Pending",
-                    "deposit_keamanan" => "required|numeric",
-                    "bukti_pembayaran" => "nullable|string"
                 ],
                 "detail_view" => true
             ],
