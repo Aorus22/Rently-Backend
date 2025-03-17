@@ -7,6 +7,7 @@ use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\KendaraanController;
 use App\Http\Controllers\API\PemesananController;
 use App\Http\Controllers\API\PembayaranController;
+use App\Http\Controllers\API\DynamicCrudController;
 use App\Models\Pembayaran;
 
 Route::get('/hello', function () {
@@ -44,9 +45,16 @@ Route::middleware(['auth:sanctum', 'admin'])->group(function() {
     Route::put('/admin/updatestatus/{id}', [PemesananController::class, 'updatePemesanan']);
 
     // CRUD Kendaraan
-    Route::post('/admin/kendaraan', [KendaraanController::class, 'store']);
-    Route::put('/admin/kendaraan/{id}', [KendaraanController::class, 'update']);
-    Route::delete('/admin/kendaraan/{id}', [KendaraanController::class, 'destroy']);
+    //Route::post('/admin/kendaraan', [KendaraanController::class, 'store']);
+    //Route::put('/admin/kendaraan/{id}', [KendaraanController::class, 'update']);
+    //Route::delete('/admin/kendaraan/{id}', [KendaraanController::class, 'destroy']);
+
+    // Dynamic CRUD
+    Route::get('/admin/{table}', [DynamicCrudController::class, 'index']);
+    Route::post('/admin/{table}', [DynamicCrudController::class, 'store']);
+    Route::get('/admin/{table}/{id}', [DynamicCrudController::class, 'show']);
+    Route::put('/admin/{table}/{id}', [DynamicCrudController::class, 'update']);
+    Route::delete('/admin/{table}/{id}', [DynamicCrudController::class, 'destroy']);
 });
 
 Route::get('/kendaraan', [KendaraanController::class, 'index']);
