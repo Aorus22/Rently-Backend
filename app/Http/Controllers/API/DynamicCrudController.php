@@ -34,7 +34,7 @@ class DynamicCrudController extends Controller
                 "detail_view" => true,
                 "validation" => [
                     "status_blokir" => "required|in:Ya,Tidak",
-                ]
+                ],
             ],
             "LokasiGarasi" => [
                 "title" => "Lokasi Garasi",
@@ -83,6 +83,9 @@ class DynamicCrudController extends Controller
                         "type" => "select",
                         "options" => $this->getForeignOptions('LokasiGarasi', 'id', 'kota')
                     ],
+                ],
+                "special_view" => [
+                    "gambar_url" => "image"
                 ],
                 "validation" => [
                     "kategori_kendaraan" => "required|in:Mobil,Minibus,Pickup",
@@ -189,6 +192,9 @@ class DynamicCrudController extends Controller
                     ],
                     "link_kontrak" => ["type" => "text"],
                     "status_kontrak" => ["type" => "select", "options" => ["Aktif", "Selesai"]]
+                ],
+                "special_view" => [
+                    "link_kontrak" => "url"
                 ],
                 "validation" => [
                     "pemesanan_id" => "required|exists:pemesanan,id",
