@@ -50,7 +50,7 @@ Route::middleware(['auth:sanctum', 'admin'])->group(function() {
     Route::get('/admin/{table}', [DynamicCrudController::class, 'index']);
     Route::post('/admin/{table}', [DynamicCrudController::class, 'store']);
     Route::get('/admin/{table}/{id}', [DynamicCrudController::class, 'show']);
-    Route::put('/admin/{table}/{id}', [DynamicCrudController::class, 'update']);
+    Route::post('/admin/{table}/{id}', [DynamicCrudController::class, 'update']);
     Route::delete('/admin/{table}/{id}', [DynamicCrudController::class, 'destroy']);
 });
 

@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Database\Eloquent\Model;
+use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
+use Illuminate\Support\Facades\Log;
 
 class DynamicCrudController extends Controller
 {
@@ -54,6 +56,12 @@ class DynamicCrudController extends Controller
                     "latitude" => "Latitude",
                     "longitude" => "Longitude"
                 ],
+                "detail_special" => [
+                    "map" => [
+                        "lat" => "latitude",
+                        "lon" => "longitude"
+                    ]
+                ],
                 "detail_view" => true,
                 "validation" => [
                     "kota" => "required|string",
@@ -70,7 +78,7 @@ class DynamicCrudController extends Controller
                 "can_delete" => true,
                 "editable_columns" => [
                     "kategori_kendaraan" => ["type" => "select", "options" => ["Mobil", "Minibus", "Pickup"]],
-                    "gambar_url" => ["type" => "text"],
+                    "gambar_url" => ["type" => "image"],
                     "merek_model" => ["type" => "text"],
                     "kapasitas_kursi" => ["type" => "number"],
                     "jenis_transmisi" => ["type" => "select", "options" => ["Manual", "Automatic"]],
@@ -89,7 +97,7 @@ class DynamicCrudController extends Controller
                 ],
                 "validation" => [
                     "kategori_kendaraan" => "required|in:Mobil,Minibus,Pickup",
-                    "gambar_url" => "required|string",
+                    "gambar_url" => "required|image|mimes:jpeg,png,jpg,gif|max:4096",
                     "merek_model" => "required|string",
                     "kapasitas_kursi" => "required|integer",
                     "jenis_transmisi" => "required|in:Manual,Automatic",
@@ -356,8 +364,17 @@ class DynamicCrudController extends Controller
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 422);
         }
+        $data = $request->all();
+        foreach ($config[$table]["editable_columns"] as $column => $settings) {
+            if ($settings["type"] === "image") {
+                $uploadResult = Cloudinary::upload($request->file($column)->getRealPath(), [
+                    'folder' => $column
+                ]);
+                $data[$column] = $uploadResult->getSecurePath(); // Store URL in database
+            }
+        }
 
-        $record = $model->create($request->all());
+        $record = $model->create($data);
         return response()->json(['message' => 'Record created successfully!', 'data' => $record]);
     }
 
@@ -398,7 +415,17 @@ class DynamicCrudController extends Controller
             return response()->json(['errors' => $validator->errors()], 422);
         }
 
-        $record->update($request->all());
+        $data = $request->all();
+        foreach ($config[$table]["editable_columns"] as $column => $settings) {
+            if ($settings["type"] === "image") {
+                $uploadResult = Cloudinary::upload($request->file($column)->getRealPath(), [
+                    'folder' => $column
+                ]);
+                $data[$column] = $uploadResult->getSecurePath(); // Store URL in database
+            }
+        }
+
+        $record->update($data);
         return response()->json(['message' => 'Record updated successfully!', 'data' => $record]);
     }
 
