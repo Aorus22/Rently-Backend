@@ -1,15 +1,14 @@
 <?php
 
 use App\Http\Controllers\API\AdminController;
+use App\Http\Controllers\API\AdminActionController;
 use App\Http\Controllers\API\LokasiGarasiController;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\API\AuthController;
 use App\Http\Controllers\API\KendaraanController;
 use App\Http\Controllers\API\PemesananController;
 use App\Http\Controllers\API\PembayaranController;
 use App\Http\Controllers\API\DynamicCrudController;
-use App\Models\Pembayaran;
 
 Route::get('/hello', function () {
     return response()->json(['message' => 'Hello World']);
@@ -45,6 +44,11 @@ Route::middleware(['auth:sanctum', 'admin'])->group(function() {
     Route::get('/admin/ceksewa', [PemesananController::class, 'getAllPemesanan']);
     Route::put('/admin/updatestatus/{id}', [PemesananController::class, 'updatePemesanan']);
 
+    Route::post('/admin/konfirmasi-lunas/{pembayaran_id}', [AdminActionController::class, 'confirmLunas']);
+    Route::post('/admin/konfirmasi-belumlunas/{pembayaran_id}', [AdminActionController::class, 'confirmBelumLunas']);
+    // Route untuk mengambil semua pemesanan beserta detail pembayaran
+    Route::get('/admin/pemesanan', [AdminActionController::class, 'getAllPemesanan']);
+    Route::get('/admin/pemesanan/{id}', [AdminActionController::class, 'getPemesananDetail']);
     // Dynamic CRUD
     Route::get('/admin/infotabeldong', [DynamicCrudController::class, 'fetchTableConfig']);
     Route::get('/admin/{table}', [DynamicCrudController::class, 'index']);
