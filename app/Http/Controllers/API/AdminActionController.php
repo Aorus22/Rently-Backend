@@ -7,11 +7,13 @@ use Illuminate\Http\Request;
 use App\Models\Pemesanan;
 use App\Models\Pembayaran;
 use App\Models\Kendaraan;
+use App\Models\KontrakSewa;
 use Illuminate\Support\Facades\DB;
+use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
 
 class AdminActionController extends Controller
 {
-    // Fungsi untuk mengonfirmasi pembayaran
+    // Mengonfirmasi pembayaran lunas
     public function confirmLunas(Request $request, $pembayaran_id)
     {
         $request->validate([
@@ -39,7 +41,7 @@ class AdminActionController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Pembayaran berhasil dikonfirmasi, jumlah pembayaran diperbarui, status pemesanan menjadi Dikonfirmasi, dan kendaraan ditandai sebagai Disewa.',
+                'message' => 'Pembayaran berhasil dikonfirmasi',
                 'data' => [
                     'pembayaran' => $pembayaran,
                     'pemesanan' => $pemesanan,
@@ -56,6 +58,7 @@ class AdminActionController extends Controller
         }
     }
 
+    // Mengonfirmasi pembayaran belum lunas
     public function confirmBelumLunas(Request $request, $pembayaran_id)
     {
         $request->validate([
@@ -83,7 +86,7 @@ class AdminActionController extends Controller
 
             return response()->json([
                 'success' => true,
-                'message' => 'Pembayaran berhasil dibatalkan, jumlah pembayaran diperbarui, status pemesanan menjadi Menunggu Pembayaran, dan kendaraan kembali Tersedia.',
+                'message' => 'Pembayaran berhasil diperbarui',
                 'data' => [
                     'pembayaran' => $pembayaran,
                     'pemesanan' => $pemesanan,
@@ -100,7 +103,7 @@ class AdminActionController extends Controller
         }
     }
 
-    // Fungsi untuk mengambil semua pemesanan beserta detail pembayarannya
+    // Mengambil semua pemesanan beserta detail pembayarannya
     public function getAllPemesanan()
     {
         try {
@@ -110,7 +113,6 @@ class AdminActionController extends Controller
                 'user'
             ])->get();
 
-            // Jika tidak ada pemesanan
             if ($pemesanan->isEmpty()) {
                 return response()->json([
                     'success' => true,
@@ -133,13 +135,15 @@ class AdminActionController extends Controller
         }
     }
 
+    // Mengambil detail pemesanan berdasarkan ID
     public function getPemesananDetail($id)
     {
         try {
             $pemesanan = Pemesanan::with([
                 'pembayaran',
                 'kendaraan',
-                'user'
+                'user',
+                'kontrakSewa'
             ])->findOrFail($id);
 
             return response()->json([
@@ -153,6 +157,89 @@ class AdminActionController extends Controller
                 'success' => false,
                 'message' => 'Gagal mengambil detail pemesanan: ' . $e->getMessage()
             ], 404);
+        }
+    }
+
+    // Upload kontrak sewa
+    public function uploadKontrakSewa(Request $request, $pemesanan_id)
+    {
+        $request->validate([
+            'file_kontrak' => 'required|file|mimes:pdf,doc,docx|max:10000'
+        ]);
+
+        try {
+            DB::beginTransaction();
+
+            $pemesanan = Pemesanan::findOrFail($pemesanan_id);
+
+            $uploadedFile = $request->file('file_kontrak');
+            $uploadResult = Cloudinary::upload($uploadedFile->getRealPath(), [
+                'folder' => 'kontrak_sewa',
+                'resource_type' => 'auto'
+            ]);
+            $kontrakUrl = $uploadResult->getSecurePath();
+
+            $kontrakSewa = new KontrakSewa();
+            $kontrakSewa->pemesanan_id = $pemesanan_id;
+            $kontrakSewa->link_kontrak = $kontrakUrl;
+            $kontrakSewa->status_kontrak = 'Aktif';
+            $kontrakSewa->save();
+
+            $pemesanan->status_pemesanan = 'Sedang dalam Penggunaan';
+            $pemesanan->save();
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Kontrak sewa berhasil diunggah dan status pemesanan diperbarui menjadi Sedang dalam Penggunaan.',
+                'data' => [
+                    'kontrak_sewa' => $kontrakSewa,
+                    'pemesanan' => $pemesanan
+                ]
+            ], 200);
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal mengunggah kontrak sewa: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function confirmPengembalian($pemesanan_id)
+    {
+        try {
+            DB::beginTransaction();
+
+            $pemesanan = Pemesanan::findOrFail($pemesanan_id);
+            $pemesanan->status_pemesanan = 'Selesai';
+            $pemesanan->save();
+
+            $kendaraan = Kendaraan::findOrFail($pemesanan->kendaraan_id);
+            $kendaraan->status_ketersediaan = 'Tersedia';
+            $kendaraan->save();
+
+            $kontrakSewa = KontrakSewa::where('pemesanan_id', $pemesanan_id)->first();
+            if ($kontrakSewa) {
+                $kontrakSewa->status_kontrak = 'Selesai';
+                $kontrakSewa->save();
+            }
+
+            DB::commit();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Pengembalian kendaraan berhasil dikonfirmasi.',
+                'data' => $pemesanan
+            ], 200);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json([
+                'success' => false,
+                'message' => 'Gagal mengonfirmasi pengembalian: ' . $e->getMessage()
+            ], 500);
         }
     }
 }

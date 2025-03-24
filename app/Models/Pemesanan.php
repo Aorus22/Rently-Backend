@@ -34,4 +34,8 @@ class Pemesanan extends Model
     {
         return $this->hasMany(Pembayaran::class, 'pemesanan_id');
     }
+    public function kontrakSewa()
+    {
+        return $this->hasOne(KontrakSewa::class, 'pemesanan_id');
+    }
 }

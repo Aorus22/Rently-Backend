@@ -60,7 +60,11 @@ class PemesananController extends Controller
     // Ambil detail pemesanan
     public function show($id)
     {
-        $pemesanan = Pemesanan::with(['kendaraan.lokasiGarasi'])->findOrFail($id);
+        $pemesanan = Pemesanan::with([
+            'pembayaran',
+            'kendaraan.lokasiGarasi',
+            'kontrakSewa'
+        ])->findOrFail($id);
 
         if ($pemesanan->user_id !== Auth::id()) {
             return response()->json(['message' => 'Unauthorized'], 403);

@@ -8,10 +8,12 @@ use App\Models\Kendaraan;
 
 class KendaraanController extends Controller
 {
-    // Mengambil semua data kendaraan
+    // Mengambil semua data kendaraan yang tersedia
     public function index()
     {
-        $kendaraan = Kendaraan::with('lokasiGarasi')->get();
+        $kendaraan = Kendaraan::with('lokasiGarasi')
+            ->where('status_ketersediaan', 'Tersedia')
+            ->get();
         return response()->json($kendaraan);
     }
 

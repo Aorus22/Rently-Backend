@@ -43,10 +43,11 @@ Route::middleware(['auth:sanctum', 'admin'])->group(function() {
     // Riwayat Sewa Atmin
     Route::get('/admin/ceksewa', [PemesananController::class, 'getAllPemesanan']);
     Route::put('/admin/updatestatus/{id}', [PemesananController::class, 'updatePemesanan']);
-
     Route::post('/admin/konfirmasi-lunas/{pembayaran_id}', [AdminActionController::class, 'confirmLunas']);
     Route::post('/admin/konfirmasi-belumlunas/{pembayaran_id}', [AdminActionController::class, 'confirmBelumLunas']);
-    // Route untuk mengambil semua pemesanan beserta detail pembayaran
+    Route::post('/admin/upload-kontrak-sewa/{pembayaran_id}', [AdminActionController::class, 'uploadKontrakSewa']);
+    Route::post('/admin/pengembalian-mobil/{pemesanan_id}', [AdminActionController::class, 'confirmPengembalian']);
+
     Route::get('/admin/pemesanan', [AdminActionController::class, 'getAllPemesanan']);
     Route::get('/admin/pemesanan/{id}', [AdminActionController::class, 'getPemesananDetail']);
     // Dynamic CRUD
