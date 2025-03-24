@@ -22,7 +22,7 @@ class PembayaranController extends Controller
             'pemesanan_id' => $pemesanan->id,
             'metode_pembayaran' => $request->metode_pembayaran,
             'jumlah_pembayaran' => 0,
-            'status_pembayaran' => 'Belum Lunas',
+            'status_pembayaran' => 'Belum Dibayar',
             'deposit_keamanan' => 0,
             'bukti_pembayaran' => null,
             'tanggal_pembayaran' => null,

@@ -166,7 +166,7 @@ class DynamicCrudController extends Controller
                 "can_update" => true,
                 "can_delete" => false,
                 "editable_columns" => [
-                    "status_pembayaran" => ["type" => "select", "options" => ["Lunas", "Belum Lunas", "Pending"]],
+                    "status_pembayaran" => ["type" => "select", "options" => ["Belum Dibayar", "Lunas", "Belum Lunas", "Pending"]],
                 ],
                 "validation" => [
                     "status_pembayaran" => "required|in:Lunas,Belum Lunas,Pending",

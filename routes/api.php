@@ -57,3 +57,4 @@ Route::middleware(['auth:sanctum', 'admin'])->group(function() {
 Route::get('/kendaraan', [KendaraanController::class, 'index']);
 Route::get('/kendaraan/{id}', [KendaraanController::class, 'show']);
 Route::get('/garasi', [LokasiGarasiController::class, 'index']);
+Route::get('/garasi/{id}', [LokasiGarasiController::class, 'show']);

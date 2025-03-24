@@ -67,7 +67,7 @@ class CreateRentalMobilSchema extends Migration
             $table->enum('metode_pembayaran', ['Transfer Bank', 'Kartu Kredit', 'E-Wallet']);
             $table->decimal('jumlah_pembayaran', 10, 2);
             $table->dateTime('tanggal_pembayaran')->nullable();
-            $table->enum('status_pembayaran', ['Lunas', 'Belum Lunas', 'Pending']);
+            $table->enum('status_pembayaran', ['Belum Dibayar', 'Lunas', 'Belum Lunas', 'Pending']);
             $table->decimal('deposit_keamanan', 10, 2);
             $table->text('bukti_pembayaran')->nullable();
             $table->timestamps();
