@@ -50,7 +50,9 @@ Route::middleware(['auth:sanctum', 'admin'])->group(function() {
 
     Route::get('/admin/pemesanan', [AdminActionController::class, 'getAllPemesanan']);
     Route::get('/admin/pemesanan/{id}', [AdminActionController::class, 'getPemesananDetail']);
+
     // Dynamic CRUD
+    Route::get('/admin/export/{table}', [DynamicCrudController::class, 'exportTable']);
     Route::get('/admin/infotabeldong', [DynamicCrudController::class, 'fetchTableConfig']);
     Route::get('/admin/{table}', [DynamicCrudController::class, 'index']);
     Route::post('/admin/{table}', [DynamicCrudController::class, 'store']);
