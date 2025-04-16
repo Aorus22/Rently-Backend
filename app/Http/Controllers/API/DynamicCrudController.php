@@ -348,12 +348,26 @@ class DynamicCrudController extends Controller
 
 
     // List all records
-    public function index($table)
+    public function index(Request $request, $table)
     {
+        $table = ($table === 'pemesananIndex') ? 'pemesanan' : $table;
         $model = $this->getModelInstance($table);
-        if (!$model) return response()->json(['message' => 'Table not found'], 404);
+        if (!$model) {
+            return response()->json(['message' => 'Table not found'], 404);
+        }
 
-        return response()->json($model->all());
+        // Get all query parameters
+        $queryParams = $request->query();
+
+        // If no filters provided, return all
+        if (empty($queryParams)) {
+            return response()->json($model->all());
+        }
+
+        // Apply filtering dynamically
+        $filtered = $model->where($queryParams)->get();
+
+        return response()->json($filtered);
     }
 
     // Store new record
