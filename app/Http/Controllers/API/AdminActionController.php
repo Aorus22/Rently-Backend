@@ -175,7 +175,7 @@ class AdminActionController extends Controller
             $uploadedFile = $request->file('file_kontrak');
             $uploadResult = Cloudinary::upload($uploadedFile->getRealPath(), [
                 'folder' => 'kontrak_sewa',
-                'resource_type' => 'auto'
+                'resource_type' => 'raw'
             ]);
             $kontrakUrl = $uploadResult->getSecurePath();
 
