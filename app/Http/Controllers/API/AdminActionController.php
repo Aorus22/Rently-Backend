@@ -164,7 +164,7 @@ class AdminActionController extends Controller
     public function uploadKontrakSewa(Request $request, $pemesanan_id)
     {
         $request->validate([
-            'file_kontrak' => 'required|file|mimes:pdf,doc,docx|max:10000'
+            'file_kontrak' => 'required|file|mimes:pdf|max:10000'
         ]);
 
         try {
@@ -175,7 +175,7 @@ class AdminActionController extends Controller
             $uploadedFile = $request->file('file_kontrak');
             $uploadResult = Cloudinary::upload($uploadedFile->getRealPath(), [
                 'folder' => 'kontrak_sewa',
-                'resource_type' => 'raw'
+                'resource_type' => 'auto'
             ]);
             $kontrakUrl = $uploadResult->getSecurePath();
 

@@ -5,9 +5,9 @@ namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Database\Eloquent\Model;
 use CloudinaryLabs\CloudinaryLaravel\Facades\Cloudinary;
-use Illuminate\Support\Facades\Log;
+use App\Exports\DynamicCRUDExport;
+use Maatwebsite\Excel\Facades\Excel;
 
 class DynamicCrudController extends Controller
 {
@@ -21,6 +21,7 @@ class DynamicCrudController extends Controller
         return [
             "User" => [
                 "title" => "User",
+                "can_export" => true,
                 "can_create" => false,
                 "can_read" => true,
                 "can_update" => true,
@@ -40,6 +41,7 @@ class DynamicCrudController extends Controller
             ],
             "LokasiGarasi" => [
                 "title" => "Lokasi Garasi",
+                "can_export" => true,
                 "can_create" => true,
                 "can_read" => true,
                 "can_update" => true,
@@ -72,6 +74,7 @@ class DynamicCrudController extends Controller
             ],
             "Kendaraan" => [
                 "title" => "Kendaraan",
+                "can_export" => true,
                 "can_create" => true,
                 "can_read" => true,
                 "can_update" => true,
@@ -124,6 +127,7 @@ class DynamicCrudController extends Controller
             ],
             "Pemesanan" => [
                 "title" => "Pemesanan",
+                "can_export" => true,
                 "can_create" => false,
                 "can_read" => true,
                 "can_update" => true,
@@ -161,6 +165,7 @@ class DynamicCrudController extends Controller
             ],
             "Pembayaran" => [
                 "title" => "Pembayaran",
+                "can_export" => true,
                 "can_create" => false,
                 "can_read" => true,
                 "can_update" => true,
@@ -189,6 +194,7 @@ class DynamicCrudController extends Controller
             ],
             "KontrakSewa" => [
                 "title" => "Kontrak Sewa",
+                "can_export" => true,
                 "can_create" => true,
                 "can_read" => true,
                 "can_update" => true,
@@ -225,6 +231,7 @@ class DynamicCrudController extends Controller
             ],
             "PelacakanKendaraan" => [
                 "title" => "Pelacakan Kendaraan",
+                "can_export" => true,
                 "can_create" => true,
                 "can_read" => true,
                 "can_update" => true,
@@ -258,6 +265,7 @@ class DynamicCrudController extends Controller
             ],
             "PerawatanKendaraan" => [
                 "title" => "Perawatan Kendaraan",
+                "can_export" => true,
                 "can_create" => true,
                 "can_read" => true,
                 "can_update" => true,
@@ -340,12 +348,26 @@ class DynamicCrudController extends Controller
 
 
     // List all records
-    public function index($table)
+    public function index(Request $request, $table)
     {
+        $table = ($table === 'pemesananIndex') ? 'pemesanan' : $table;
         $model = $this->getModelInstance($table);
-        if (!$model) return response()->json(['message' => 'Table not found'], 404);
+        if (!$model) {
+            return response()->json(['message' => 'Table not found'], 404);
+        }
 
-        return response()->json($model->all());
+        // Get all query parameters
+        $queryParams = $request->query();
+
+        // If no filters provided, return all
+        if (empty($queryParams)) {
+            return response()->json($model->all());
+        }
+
+        // Apply filtering dynamically
+        $filtered = $model->where($queryParams)->get();
+
+        return response()->json($filtered);
     }
 
     // Store new record
@@ -445,5 +467,13 @@ class DynamicCrudController extends Controller
 
         $record->delete();
         return response()->json(['message' => 'Record deleted successfully!']);
+    }
+
+    public function exportTable($table)
+    {
+        $model = $this->getModelInstance($table);
+        if (!$model) return response()->json(['message' => 'Table not found'], 404);
+
+        return Excel::download(new DynamicCRUDExport($model), "{$table}.xlsx");
     }
 }
