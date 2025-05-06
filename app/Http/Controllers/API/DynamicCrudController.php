@@ -112,6 +112,7 @@ class DynamicCrudController extends Controller
                     "lokasi_garasi_id" => "required|exists:lokasi_garasi,id"
                 ],
                 "visible_columns" => [
+                    "gambar_url" => "Foto Mobil",
                     "kategori_kendaraan" => "Kategori Kendaraan",
                     "merek_model" => "Merek Model",
                     "status_ketersediaan" => "Status Ketersediaan"
@@ -439,11 +440,11 @@ class DynamicCrudController extends Controller
 
         $data = $request->all();
         foreach ($config[$table]["editable_columns"] as $column => $settings) {
-            if ($settings["type"] === "image") {
+            if ($settings["type"] === "image" && $request->hasFile($column)) {
                 $uploadResult = Cloudinary::upload($request->file($column)->getRealPath(), [
                     'folder' => $column
                 ]);
-                $data[$column] = $uploadResult->getSecurePath(); // Store URL in database
+                $data[$column] = $uploadResult->getSecurePath();
             }
         }
 
