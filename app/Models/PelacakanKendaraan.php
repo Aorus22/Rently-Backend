@@ -16,4 +16,9 @@ class PelacakanKendaraan extends Model
         'lokasi_mobil_digunakan',
         'status_kondisi_setelah_sewa',
     ];
+
+    public function kendaraan()
+    {
+        return $this->belongsTo(Kendaraan::class, 'kendaraan_id');
+    }
 }

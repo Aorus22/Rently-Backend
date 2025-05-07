@@ -19,4 +19,9 @@ class PerawatanKendaraan extends Model
         'bengkel_teknisi',
         'catatan_tambahan'
     ];
+
+    public function kendaraan()
+    {
+        return $this->belongsTo(Kendaraan::class, 'kendaraan_id');
+    }
 }

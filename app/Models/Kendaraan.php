@@ -29,4 +29,19 @@ class Kendaraan extends Model
     {
         return $this->belongsTo(LokasiGarasi::class, 'lokasi_garasi_id');
     }
+
+    public function pemesanan()
+    {
+        return $this->hasMany(Pemesanan::class, 'kendaraan_id');
+    }
+
+    public function perawatanKendaraan()
+    {
+        return $this->hasMany(PerawatanKendaraan::class, 'kendaraan_id');
+    }
+
+    public function pelacakanKendaraan()
+    {
+        return $this->hasMany(PelacakanKendaraan::class, 'kendaraan_id');
+    }
 }

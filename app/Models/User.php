@@ -23,4 +23,9 @@ class User extends Authenticatable
         'password',
         'remember_token',
     ];
+
+    public function pemesanan()
+    {
+        return $this->hasMany(Pemesanan::class, 'user_id');
+    }
 }

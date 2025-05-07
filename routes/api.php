@@ -9,6 +9,7 @@ use App\Http\Controllers\API\KendaraanController;
 use App\Http\Controllers\API\PemesananController;
 use App\Http\Controllers\API\PembayaranController;
 use App\Http\Controllers\API\DynamicCrudController;
+use App\Http\Controllers\API\AdminDashboardController;
 
 Route::get('/hello', function () {
     return response()->json(['message' => 'Hello World']);
@@ -17,6 +18,8 @@ Route::get('/hello', function () {
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/adminlogin', [AdminController::class, 'login']);
+Route::get('/admin/dashboard', [AdminDashboardController::class, 'index']);
+
 
 // User (no middleware)
 Route::middleware('auth:sanctum')->group(function () {
